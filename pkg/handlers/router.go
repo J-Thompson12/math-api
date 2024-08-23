@@ -35,6 +35,8 @@ func BuildRouter(r *echo.Echo) {
 		Timeout:      1 * time.Second,
 	}))
 
+	r.Validator = NewValidator()
+
 	r.GET("/min", handleMin)
 	r.GET("/max", handleMax)
 	r.GET("/avg", handleAverage)

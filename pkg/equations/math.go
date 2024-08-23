@@ -13,32 +13,32 @@ func (e ErrBadRequest) Error() string {
 
 // Min returns a list the size of quantifier containing the smallest numbers in the list
 func Min(list []int, quantifier int) ([]int, error) {
-	if len(list) == 0 {
-		return nil, ErrBadRequest("Cannot detect a min value in an empty slice")
+	if quantifier > len(list) {
+		return nil, ErrBadRequest("quantifier must be less than or equal to the length of the list")
+	}
+	if quantifier == 0 {
+		return nil, ErrBadRequest("quantifier must be greater than 0")
 	}
 
 	sort.Ints(list)
-
 	return list[:quantifier], nil
 }
 
 // Max returns a list the size of quantifier containing the largest numbers in the list
 func Max(list []int, quantifier int) ([]int, error) {
-	if len(list) == 0 {
-		return nil, ErrBadRequest("Cannot detect a max value in an empty slice")
+	if quantifier > len(list) {
+		return nil, ErrBadRequest("quantifier must be less than or equal to the length of the list")
+	}
+	if quantifier == 0 {
+		return nil, ErrBadRequest("quantifier must be greater than 0")
 	}
 
 	sort.Sort(sort.Reverse(sort.IntSlice(list)))
-
 	return list[:quantifier], nil
 }
 
 // Average returns the average of the numbers in the list
 func Average(list []int) (float64, error) {
-	if len(list) == 0 {
-		return 0, ErrBadRequest("Cannot detect an averge value in an empty slice")
-	}
-
 	sum := 0
 	for _, x := range list {
 		sum += x
@@ -51,10 +51,6 @@ func Average(list []int) (float64, error) {
 
 // Median returns the median of the numbers in the list
 func Median(list []int) (int, error) {
-	if len(list) == 0 {
-		return 0, ErrBadRequest("Cannot detect a median value in an empty slice")
-	}
-
 	sort.Ints(list)
 
 	middle := len(list) / 2
@@ -70,8 +66,11 @@ func Median(list []int) (int, error) {
 
 // Percentile returns the percentile of the list given the provided quantifier
 func Percentile(list []int, quantifier int) (int, error) {
-	if len(list) == 0 {
-		return 0, ErrBadRequest("Cannot detect a percentile value in an empty slice")
+	if quantifier > 100 {
+		return 0, ErrBadRequest("quantifier must be less than or equal to 100")
+	}
+	if quantifier == 0 {
+		return 0, ErrBadRequest("quantifier must be greater than 0")
 	}
 
 	sort.Ints(list)

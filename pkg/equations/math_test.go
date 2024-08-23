@@ -6,25 +6,31 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// If I did this all over I would do all the tests in this format.
+// I feel its easier to read when you have lots of tests.
+// I left the rest as is for comparison.
 func TestMin(t *testing.T) {
-	cases := []struct {
-		list       []int
-		quantifier int
-		expected   []int
-	}{
-		{[]int{2, 1, 4}, 2, []int{1, 2}},
-		{[]int{2, 1, 4}, 1, []int{1}},
-		{[]int{2, 1, 4, 6, 10, 3, 20}, 5, []int{1, 2, 3, 4, 6}},
-	}
+	t.Run("0 quantifier", func(t *testing.T) {
+		_, err := Min([]int{2, 1, 4}, 0)
+		require.ErrorAs(t, err, new(ErrBadRequest))
+	})
 
-	_, err := Min([]int{}, 3)
-	require.Error(t, err)
+	t.Run("quantifier larger than list", func(t *testing.T) {
+		_, err := Min([]int{2, 1, 4}, 4)
+		require.ErrorAs(t, err, new(ErrBadRequest))
+	})
 
-	for _, c := range cases {
-		result, err := Min(c.list, c.quantifier)
+	t.Run("1 quantifier", func(t *testing.T) {
+		result, err := Min([]int{2, 1, 4}, 1)
 		require.NoError(t, err)
-		require.Equal(t, c.expected, result)
-	}
+		require.Equal(t, []int{1}, result)
+	})
+
+	t.Run("2 quantifier", func(t *testing.T) {
+		result, err := Min([]int{2, 1, 4}, 2)
+		require.NoError(t, err)
+		require.Equal(t, []int{1, 2}, result)
+	})
 }
 
 func TestMax(t *testing.T) {
