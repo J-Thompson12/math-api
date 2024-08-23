@@ -9,7 +9,7 @@ import (
 )
 
 type Request struct {
-	List       []int `json:"list"`
+	List       []int `json:"list" validate:"required,min=1"`
 	Quantifier int   `json:"quantifier"`
 }
 
@@ -108,6 +108,10 @@ func newRequest(c echo.Context) (Request, error) {
 	var req Request
 	if err := c.Bind(&req); err != nil {
 		return req, echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("invalid request: %w ", err))
+	}
+
+	if err := c.Validate(req); err != nil {
+		return Request{}, echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	return req, nil
