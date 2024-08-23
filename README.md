@@ -1,3 +1,4 @@
+// this documentation is pretty bad all of them need to have descriptions for what each endpoint does as well as the examples
 # math-api
 Example api requests
 
