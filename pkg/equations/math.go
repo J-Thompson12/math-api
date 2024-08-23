@@ -12,12 +12,12 @@ func (e ErrBadRequest) Error() string {
 }
 
 // Min returns a list the size of quantifier containing the smallest numbers in the list
+// If I was to redo this whole thing it would be nice to have all these functions be generic
+// and the endpoints can then use differnent types
 func Min(list []int, quantifier int) ([]int, error) {
-	if quantifier > len(list) {
-		return nil, ErrBadRequest("quantifier must be less than or equal to the length of the list")
-	}
-	if quantifier == 0 {
-		return nil, ErrBadRequest("quantifier must be greater than 0")
+	err := validateQuantifier(quantifier, list)
+	if err != nil {
+		return nil, err
 	}
 
 	sort.Ints(list)
@@ -26,11 +26,9 @@ func Min(list []int, quantifier int) ([]int, error) {
 
 // Max returns a list the size of quantifier containing the largest numbers in the list
 func Max(list []int, quantifier int) ([]int, error) {
-	if quantifier > len(list) {
-		return nil, ErrBadRequest("quantifier must be less than or equal to the length of the list")
-	}
-	if quantifier == 0 {
-		return nil, ErrBadRequest("quantifier must be greater than 0")
+	err := validateQuantifier(quantifier, list)
+	if err != nil {
+		return nil, err
 	}
 
 	sort.Sort(sort.Reverse(sort.IntSlice(list)))
@@ -66,11 +64,9 @@ func Median(list []int) (int, error) {
 
 // Percentile returns the percentile of the list given the provided quantifier
 func Percentile(list []int, quantifier int) (int, error) {
-	if quantifier > 100 {
-		return 0, ErrBadRequest("quantifier must be less than or equal to 100")
-	}
-	if quantifier == 0 {
-		return 0, ErrBadRequest("quantifier must be greater than 0")
+	err := validateQuantifier(quantifier, list)
+	if err != nil {
+		return 0, err
 	}
 
 	sort.Ints(list)
@@ -78,4 +74,15 @@ func Percentile(list []int, quantifier int) (int, error) {
 	round := int(math.Ceil(ordinal))
 
 	return list[round-1], nil
+}
+
+func validateQuantifier(quantifier int, list []int) error {
+	if quantifier > len(list) {
+		return ErrBadRequest("quantifier must be less than or equal to the length of the list")
+	}
+	if quantifier == 0 {
+		return ErrBadRequest("quantifier must be greater than 0")
+	}
+	return nil
+
 }

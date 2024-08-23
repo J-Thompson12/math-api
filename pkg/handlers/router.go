@@ -13,6 +13,8 @@ func BuildRouter(r *echo.Echo) {
 	r.Use(middleware.Recover())
 	r.Use(middleware.Secure())
 	r.Use(middleware.BodyLimit("1KB"))
+	// In a real system I wouldnt log every request because the cost and noise would be bad.
+	// I just added this because I wanted to test it out
 	r.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogLatency:       true,
 		LogMethod:        true,
