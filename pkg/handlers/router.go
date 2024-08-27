@@ -6,6 +6,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
+
+	cm "github.com/J-Thompson12/math-api/pkg/middleware"
+	"github.com/J-Thompson12/math-api/pkg/validator"
 )
 
 // BuildRouter sets up the routes for the API
@@ -36,8 +39,9 @@ func BuildRouter(r *echo.Echo) {
 		ErrorMessage: "request timed out",
 		Timeout:      1 * time.Second,
 	}))
+	r.Use(cm.InitEquation(r.AcquireContext()))
 
-	r.Validator = NewValidator()
+	r.Validator = validator.NewValidator()
 
 	r.GET("/min", handleMin)
 	r.GET("/max", handleMax)

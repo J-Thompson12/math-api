@@ -11,23 +11,27 @@ import (
 // I left the rest as is for comparison.
 func TestMin(t *testing.T) {
 	t.Run("0 quantifier", func(t *testing.T) {
-		_, err := Min([]int{2, 1, 4}, 0)
+		e := NewEquationWithQuantifier([]int{2, 1, 4}, 0)
+		_, err := e.Min()
 		require.ErrorAs(t, err, new(ErrBadRequest))
 	})
 
 	t.Run("quantifier larger than list", func(t *testing.T) {
-		_, err := Min([]int{2, 1, 4}, 4)
+		e := NewEquationWithQuantifier([]int{2, 1, 4}, 5)
+		_, err := e.Min()
 		require.ErrorAs(t, err, new(ErrBadRequest))
 	})
 
 	t.Run("1 quantifier", func(t *testing.T) {
-		result, err := Min([]int{2, 1, 4}, 1)
+		e := NewEquationWithQuantifier([]int{2, 1, 4}, 1)
+		result, err := e.Min()
 		require.NoError(t, err)
 		require.Equal(t, []int{1}, result)
 	})
 
 	t.Run("2 quantifier", func(t *testing.T) {
-		result, err := Min([]int{2, 1, 4}, 2)
+		e := NewEquationWithQuantifier([]int{2, 1, 4}, 2)
+		result, err := e.Min()
 		require.NoError(t, err)
 		require.Equal(t, []int{1, 2}, result)
 	})
@@ -35,20 +39,20 @@ func TestMin(t *testing.T) {
 
 func TestMax(t *testing.T) {
 	cases := []struct {
-		list       []int
-		quantifier int
-		expected   []int
+		e        Equation
+		expected []int
 	}{
-		{[]int{2, 1, 4}, 2, []int{4, 2}},
-		{[]int{2, 1, 4}, 1, []int{4}},
-		{[]int{2, 1, 4, 6, 10, 3, 20}, 5, []int{20, 10, 6, 4, 3}},
+		{NewEquationWithQuantifier([]int{2, 1, 4}, 2), []int{4, 2}},
+		{NewEquationWithQuantifier([]int{2, 1, 4}, 1), []int{4}},
+		{NewEquationWithQuantifier([]int{2, 1, 4, 6, 10, 3, 20}, 5), []int{20, 10, 6, 4, 3}},
 	}
 
-	_, err := Max([]int{}, 3)
+	e := NewEquationWithQuantifier([]int{}, 0)
+	_, err := e.Max()
 	require.Error(t, err)
 
 	for _, c := range cases {
-		result, err := Max(c.list, c.quantifier)
+		result, err := c.e.Max()
 		require.NoError(t, err)
 		require.Equal(t, c.expected, result)
 	}
@@ -56,19 +60,16 @@ func TestMax(t *testing.T) {
 
 func TestAverage(t *testing.T) {
 	cases := []struct {
-		list     []int
+		e        Equation
 		expected float64
 	}{
-		{[]int{2, 1, 4, 4}, 2.75},
-		{[]int{2, 1, 4}, 2.33},
-		{[]int{2, 1, 4, 6, 10, 3, 20}, 6.57},
+		{NewEquation([]int{2, 1, 4, 4}), 2.75},
+		{NewEquation([]int{2, 1, 4}), 2.33},
+		{NewEquation([]int{2, 1, 4, 6, 10, 3, 20}), 6.57},
 	}
 
-	_, err := Average([]int{})
-	require.Error(t, err)
-
 	for _, c := range cases {
-		result, err := Average(c.list)
+		result, err := c.e.Average()
 		require.NoError(t, err)
 		require.Equal(t, c.expected, result)
 	}
@@ -76,19 +77,16 @@ func TestAverage(t *testing.T) {
 
 func TestMedian(t *testing.T) {
 	cases := []struct {
-		list     []int
+		e        Equation
 		expected int
 	}{
-		{[]int{2, 1, 4, 4}, 3},
-		{[]int{1, 2, 4, 5, 3}, 3},
-		{[]int{2, 1, 4, 6, 10, 3, 20}, 4},
+		{NewEquation([]int{2, 1, 4, 4}), 3},
+		{NewEquation([]int{1, 2, 4, 5, 3}), 3},
+		{NewEquation([]int{2, 1, 4, 6, 10, 3, 20}), 4},
 	}
 
-	_, err := Median([]int{})
-	require.Error(t, err)
-
 	for _, c := range cases {
-		result, err := Median(c.list)
+		result, err := c.e.Median()
 		require.NoError(t, err)
 		require.Equal(t, c.expected, result)
 	}
@@ -96,21 +94,17 @@ func TestMedian(t *testing.T) {
 
 func TestPercentile(t *testing.T) {
 	cases := []struct {
-		list       []int
-		quantifier int
-		expected   int
+		e        Equation
+		expected int
 	}{
-		{[]int{15, 20, 35, 40, 50}, 30, 20},
-		{[]int{15, 20, 35, 40, 50}, 5, 15},
-		{[]int{15, 20, 35, 40, 50}, 50, 35},
-		{[]int{15, 20, 35, 40, 50}, 100, 50},
+		{NewEquationWithQuantifier([]int{15, 20, 35, 40, 50}, 30), 20},
+		{NewEquationWithQuantifier([]int{15, 20, 35, 40, 50}, 5), 15},
+		{NewEquationWithQuantifier([]int{15, 20, 35, 40, 50}, 50), 35},
+		{NewEquationWithQuantifier([]int{15, 20, 35, 40, 50}, 100), 50},
 	}
 
-	_, err := Percentile([]int{}, 20)
-	require.Error(t, err)
-
 	for _, c := range cases {
-		result, err := Percentile(c.list, c.quantifier)
+		result, err := c.e.Percentile()
 		require.NoError(t, err)
 		require.Equal(t, c.expected, result)
 	}
